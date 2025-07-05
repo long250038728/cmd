@@ -1,4 +1,4 @@
-module github.com/long250038728/cmd/kubernets
+module github.com/long250038728/cmd/mcp
 
 go 1.24.0 // 最低要求 Go 1.23.8
 

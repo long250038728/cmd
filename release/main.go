@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/long250038728/cmd/release/client"
 	"github.com/long250038728/web/tool/configurator"
 	"github.com/long250038728/web/tool/git"
 	"github.com/long250038728/web/tool/hook"

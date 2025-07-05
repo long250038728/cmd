@@ -68,7 +68,7 @@ func main() {
 	olineCron := client.NewReleaseCron(gitClient, jenkinsClient, ormClient, sshClient, hookClient, tels)
 
 	rootCmd := &cobra.Command{
-		Use:   "linl",
+		Use:   "release",
 		Short: "快速生成工具",
 	}
 

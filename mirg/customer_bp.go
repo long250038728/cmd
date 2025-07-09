@@ -118,7 +118,7 @@ func CustomerBpAction(accessToken int) {
 
 	// 获取会员信息
 	var ormConfig orm.Config
-	configurator.NewYaml().MustLoadConfigPath("online/db.yaml", &ormConfig)
+	configurator.NewYaml().MustLoad("./config/online/db.yaml", &ormConfig)
 	db, err := orm.NewMySQLGorm(&ormConfig)
 	if err != nil {
 		panic(err)
@@ -154,7 +154,7 @@ func CustomerBpAction(accessToken int) {
 	// 发送消息
 	ctx := context.Background()
 	var redisConfig cache.Config
-	configurator.NewYaml().MustLoadConfigPath("online/redis.yaml", &redisConfig)
+	configurator.NewYaml().MustLoad("./config/online/redis.yaml", &redisConfig)
 	mq := cache.NewRedis(&redisConfig)
 	for _, item := range customerBpLog {
 		b, err := json.Marshal(&item)

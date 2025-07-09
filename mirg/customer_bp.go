@@ -11,6 +11,8 @@ import (
 	"github.com/long250038728/web/tool/persistence/orm"
 	"github.com/long250038728/web/tool/sliceconv"
 	"math"
+	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -87,6 +89,15 @@ type CustomerBpLog struct {
 //====================================================================
 
 func CustomerBpAction(accessToken int) {
+	wd, err := os.Getwd()
+	if err != nil {
+		panic(fmt.Errorf("获取当前配置路径失败: %w", err))
+	}
+	err = os.Setenv("CONFIG", filepath.Join(wd, "config"))
+	if err != nil {
+		panic(fmt.Errorf("设置配置文件路径失败: %w", err))
+	}
+
 	if accessToken != time.Now().Day() {
 		panic(errors.New("check accessToken"))
 	}
@@ -118,7 +129,7 @@ func CustomerBpAction(accessToken int) {
 
 	// 获取会员信息
 	var ormConfig orm.Config
-	configurator.NewYaml().MustLoad("./config/online/db.yaml", &ormConfig)
+	configurator.NewYaml().MustLoadConfigPath("online/db.yaml", &ormConfig)
 	db, err := orm.NewMySQLGorm(&ormConfig)
 	if err != nil {
 		panic(err)
@@ -154,7 +165,7 @@ func CustomerBpAction(accessToken int) {
 	// 发送消息
 	ctx := context.Background()
 	var redisConfig cache.Config
-	configurator.NewYaml().MustLoad("./config/online/redis.yaml", &redisConfig)
+	configurator.NewYaml().MustLoadConfigPath("online/redis.yaml", &redisConfig)
 	mq := cache.NewRedis(&redisConfig)
 	for _, item := range customerBpLog {
 		b, err := json.Marshal(&item)

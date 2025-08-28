@@ -3,7 +3,7 @@ module github.com/long250038728/cmd/release
 go 1.23.8 // 最低要求 Go 1.23.8
 
 require (
-	github.com/long250038728/web v0.0.2-0.20250704061518-b6b9ee00fcf9
+	github.com/long250038728/web v1.0.0
 	github.com/spf13/cobra v1.8.0
 	gorm.io/gorm v1.25.10
 )
@@ -126,7 +126,7 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20240903143218-8af14fe29dc1 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240903143218-8af14fe29dc1 // indirect
 	google.golang.org/grpc v1.66.1 // indirect
-	google.golang.org/protobuf v1.34.2 // indirect
+	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/clickhouse v0.6.1 // indirect
 	gorm.io/driver/mysql v1.5.2 // indirect

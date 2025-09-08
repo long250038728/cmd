@@ -98,12 +98,6 @@ func CustomerBpAction(accessToken int) {
 	isAdd := true     // 新增 or 扣减
 	isChange := false // excel中数据是否需要加上负数
 
-	var Type int32 = 2
-	Comment := "手工录入(积分扣减)"
-	if isAdd {
-		Comment = "手工录入(积分增加)"
-	}
-
 	// 获取表格信息
 	data, err := loadExcel(Path, sheet, isAdd, isChange)
 	if err != nil {
@@ -126,17 +120,39 @@ func CustomerBpAction(accessToken int) {
 	customers := make([]*Customer, 0, len(tels))
 	for _, chuck := range sliceconv.Chunk(tels, 10000) {
 		chuckCustomers := make([]*Customer, 0, 10000)
-		if err := db.Where("merchant_id = ?", merchantId).
-			Where("brand_id = ?", BrandId).
-			Where("status = ?", 1).
-			Where("telephone in (?)", chuck).
-			Find(&chuckCustomers).Error; err != nil {
+
+		query := orm.NewBoolQuery().Must(
+			orm.Eq("merchant_id", merchantId),
+			orm.Eq("brand_id", BrandId),
+			orm.Eq("status", 1),
+			orm.In("telephone", chuck),
+		)
+
+		if query.IsEmpty() {
+			panic(errors.New("query is empty"))
+		}
+
+		sql, args := query.Do()
+		if err := db.Where(sql, args...).Find(&chuckCustomers).Error; err != nil {
 			panic(err)
 		}
+
+		//if err := db.Where("merchant_id = ?", merchantId).
+		//	Where("brand_id = ?", BrandId).
+		//	Where("status = ?", 1).
+		//	Where("telephone in (?)", chuck).
+		//	Find(&chuckCustomers).Error; err != nil {
+		//	panic(err)
+		//}
 		customers = append(customers, chuckCustomers...)
 	}
 
 	// 转换成新的结构体
+	var Type int32 = 2
+	Comment := "手工录入(积分扣减)"
+	if isAdd {
+		Comment = "手工录入(积分增加)"
+	}
 	customerBpLog := sliceconv.Change(customers, func(customer *Customer) *CustomerBpLog {
 		return &CustomerBpLog{
 			MerchantId:     customer.MerchantId,

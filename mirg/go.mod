@@ -2,7 +2,7 @@ module github.com/long250038728/cmd/mirg
 
 go 1.23.8 // 最低要求 Go 1.23.8
 
-require github.com/long250038728/web v0.0.2-0.20250704061518-b6b9ee00fcf9
+require github.com/long250038728/web v1.0.0
 
 require (
 	github.com/ClickHouse/ch-go v0.61.5 // indirect
@@ -49,5 +49,4 @@ require (
 	gorm.io/driver/clickhouse v0.6.1 // indirect
 	gorm.io/driver/mysql v1.5.2 // indirect
 	gorm.io/gorm v1.25.10 // indirect
-
 )

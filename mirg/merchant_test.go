@@ -143,12 +143,12 @@ func MerchantAction(accessToken int) {
 				panic(err)
 			}
 
-			ids := sliceconv.Extract(datchuckCustomersa, func(d *Customer) int32 {
+			ids := sliceconv.Extract(chuckCustomers, func(d *Customer) int32 {
 				return d.Id
 			})
 
 			row := db.Table("zby_customer").Where("id in (?)", ids).Updates(map[string]any{
-				"merchant_shop_id": id,
+				"merchant_shop_id": merchantShopId,
 				"update_time":      time.Now().Unix(),
 			}).RowsAffected
 			fmt.Println(row)

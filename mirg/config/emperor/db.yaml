@@ -1,0 +1,7 @@
+address: "gz-cdb-n7hhanlx.sql.tencentcdb.com"
+port: 28023
+database: "zhubaoe_emperor"
+table_prefix: "zby_"
+user: "root"
+password: "emperor2025!@#$!!!"
+

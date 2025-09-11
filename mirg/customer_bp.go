@@ -11,6 +11,7 @@ import (
 	"github.com/long250038728/web/tool/persistence/orm"
 	"github.com/long250038728/web/tool/sliceconv"
 	"math"
+	"os"
 	"time"
 )
 
@@ -82,6 +83,11 @@ type CustomerBpLog struct {
 	ActivityName string  `json:"activity_name"`
 	ActivityId   int32   `json:"activity_id"`
 	AdminUserId  int32   `json:"admin_user_id"`
+
+	OrderId      int32  `json:"order_id"`
+	OrderSn      string `json:"order_sn"`
+	OrderGoodsId int32  `json:"order_goods_id"`
+	StockCode    string `json:"stock_code"`
 }
 
 //====================================================================
@@ -166,6 +172,33 @@ func CustomerBpAction(accessToken int) {
 			Point:          telHash[customer.Telephone].Bonus,
 		}
 	})
+
+	// 发送消息
+	ctx := context.Background()
+	var redisConfig cache.Config
+	configurator.NewYaml().MustLoad("./config/online/redis.yaml", &redisConfig)
+	mq := cache.NewRedis(&redisConfig)
+	for _, item := range customerBpLog {
+		b, err := json.Marshal(&item)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		fmt.Println(mq.LPush(ctx, "mq_pipeline_bonus", string(b)))
+	}
+}
+
+func CustomerJson() {
+	b, err := os.ReadFile("/Users/linlong/Desktop/insert_data_fixed.json")
+	if err != nil {
+		return
+	}
+
+	var customerBpLog []*CustomerBpLog
+	err = json.Unmarshal(b, &customerBpLog)
+	if err != nil {
+		return
+	}
 
 	// 发送消息
 	ctx := context.Background()

@@ -127,29 +127,27 @@ func CustomerBpAction(accessToken int) {
 	for _, chuck := range sliceconv.Chunk(tels, 10000) {
 		chuckCustomers := make([]*Customer, 0, 10000)
 
-		//query := orm.NewBoolQuery().Must(
-		//	orm.Eq("merchant_id", merchantId),
-		//	orm.Eq("brand_id", BrandId),
-		//	orm.Eq("status", 1),
-		//	orm.In("telephone", chuck),
-		//)
-		//
-		//if query.IsEmpty() {
-		//	panic(errors.New("query is empty"))
-		//}
-		//
-		//sql, args := query.Do()
-		//if err := db.Where(sql, args...).Find(&chuckCustomers).Error; err != nil {
-		//	panic(err)
-		//}
-
-		if err := db.Where("merchant_id = ?", merchantId).
-			Where("brand_id = ?", BrandId).
-			Where("status = ?", 1).
-			Where("telephone in (?)", chuck).
-			Find(&chuckCustomers).Error; err != nil {
+		query := orm.NewBoolQuery().Must(
+			orm.Eq("merchant_id", merchantId),
+			orm.Eq("brand_id", BrandId),
+			orm.Eq("status", 1),
+			orm.In("telephone", chuck),
+		)
+		if query.IsEmpty() {
+			panic(errors.New("query is empty"))
+		}
+		sql, args := query.Do()
+		if err := db.Where(sql, args...).Find(&chuckCustomers).Error; err != nil {
 			panic(err)
 		}
+
+		//if err := db.Where("merchant_id = ?", merchantId).
+		//	Where("brand_id = ?", BrandId).
+		//	Where("status = ?", 1).
+		//	Where("telephone in (?)", chuck).
+		//	Find(&chuckCustomers).Error; err != nil {
+		//	panic(err)
+		//}
 		customers = append(customers, chuckCustomers...)
 	}
 

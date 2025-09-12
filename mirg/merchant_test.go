@@ -5,5 +5,5 @@ import (
 )
 
 func TestCustomerMerchantShopMove(t *testing.T) {
-	MerchantAction(1)
+	MerchantAction()
 }

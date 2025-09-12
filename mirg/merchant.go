@@ -2,6 +2,7 @@ package mirg
 
 import (
 	"fmt"
+	"github.com/long250038728/cmd/mirg/model"
 	"github.com/long250038728/web/tool/configurator"
 	"github.com/long250038728/web/tool/excel"
 	"github.com/long250038728/web/tool/persistence/orm"
@@ -9,31 +10,21 @@ import (
 	"time"
 )
 
-type EModel struct {
+type excelModel struct {
 	Telephone    string `json:"telephone"`
 	MerchantShop string `json:"merchant_shop"`
 }
 
-type CustomerLog struct {
-	MerchantId     int32  `json:"merchant_id"`
-	MerchantShopId int32  `json:"merchant_shop_id"`
-	CustomerId     int32  `json:"customer_id"`
-	CustomerName   string `json:"customer_name"`
-	Type           int32  `json:"type"`
-	Comment        string `json:"comment"`
-	CreateTime     string `json:"create_time"`
-}
-
-var EHeader = []excel.Header{
+var excelHeader = []excel.Header{
 	{Key: "telephone", Name: "手机号", Type: "string"},
 	{Key: "merchant_shop", Name: "转移门店", Type: "string"},
 }
 
-func EExcel(path, sheet string) ([]*EModel, error) {
-	var data []*EModel
+func excelExcel(path, sheet string) ([]*excelModel, error) {
+	var data []*excelModel
 	r := excel.NewRead(path)
 	defer r.Close()
-	err := r.Read(sheet, EHeader, &data)
+	err := r.Read(sheet, excelHeader, &data)
 
 	if err != nil {
 		return nil, err
@@ -48,14 +39,14 @@ type MerchantShop struct {
 
 //====================================================================
 
-func MerchantAction(accessToken int) {
+func MerchantAction() {
 	var merchantId int32 = 3
 	BrandId := 1
 	Path := "/Users/linlong/Desktop/a.xlsx"
 	sheet := "Sheet2"
 
 	// 获取表格信息
-	data, err := EExcel(Path, sheet)
+	data, err := excelExcel(Path, sheet)
 	if err != nil {
 		panic(err)
 	}
@@ -95,7 +86,7 @@ func MerchantAction(accessToken int) {
 
 		for index, chuck := range sliceconv.Chunk(val, 1000) {
 			chuckCustomers := make([]*Customer, 0, 1000)
-			chuckCustomerLogs := make([]*CustomerLog, 0, 100)
+			chuckCustomerLogs := make([]*model.CustomerLog, 0, 100)
 
 			query := orm.NewBoolQuery().Must(
 				orm.Eq("merchant_id", merchantId),
@@ -125,7 +116,7 @@ func MerchantAction(accessToken int) {
 			fmt.Println(shop, index, len(chuckCustomers), len(chuck), res.RowsAffected)
 
 			for _, c := range chuckCustomers {
-				chuckCustomerLogs = append(chuckCustomerLogs, &CustomerLog{
+				chuckCustomerLogs = append(chuckCustomerLogs, &model.CustomerLog{
 					MerchantId:     merchantId,
 					MerchantShopId: merchantShopId,
 					CustomerId:     c.Id,

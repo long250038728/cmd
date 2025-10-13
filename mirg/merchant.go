@@ -17,7 +17,7 @@ type excelModel struct {
 
 var excelHeader = []excel.Header{
 	{Key: "telephone", Name: "手机号", Type: "string"},
-	{Key: "merchant_shop", Name: "转移门店", Type: "string"},
+	{Key: "merchant_shop", Name: "迁移门店", Type: "string"},
 }
 
 func excelExcel(path, sheet string) ([]*excelModel, error) {
@@ -43,7 +43,7 @@ func MerchantAction() {
 	var merchantId int32 = 3
 	BrandId := 1
 	Path := "/Users/linlong/Desktop/a.xlsx"
-	sheet := "Sheet2"
+	sheet := "Sheet1"
 
 	// 获取表格信息
 	data, err := excelExcel(Path, sheet)
@@ -86,7 +86,6 @@ func MerchantAction() {
 
 		for index, chuck := range sliceconv.Chunk(val, 1000) {
 			chuckCustomers := make([]*Customer, 0, 1000)
-			chuckCustomerLogs := make([]*model.CustomerLog, 0, 100)
 
 			query := orm.NewBoolQuery().Must(
 				orm.Eq("merchant_id", merchantId),
@@ -113,8 +112,10 @@ func MerchantAction() {
 				fmt.Println(err.Error())
 			}
 
+			//fmt.Println(merchantShopId, shop, index, len(chuckCustomers), len(chuck), len(ids))
 			fmt.Println(shop, index, len(chuckCustomers), len(chuck), res.RowsAffected)
 
+			chuckCustomerLogs := make([]*model.CustomerLog, 0, 100)
 			for _, c := range chuckCustomers {
 				chuckCustomerLogs = append(chuckCustomerLogs, &model.CustomerLog{
 					MerchantId:     merchantId,
@@ -123,7 +124,7 @@ func MerchantAction() {
 					CustomerName:   c.Name,
 					Type:           3,
 					Comment:        "从" + shopNameHash[c.MerchantShopId] + "迁移到" + shop,
-					CreateTime:     "2025-09-15 10:00:00",
+					CreateTime:     "2025-10-15 10:00:00",
 				})
 			}
 

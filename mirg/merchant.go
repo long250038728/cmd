@@ -112,18 +112,23 @@ func MerchantAction() {
 				fmt.Println(err.Error())
 			}
 
-			//fmt.Println(merchantShopId, shop, index, len(chuckCustomers), len(chuck), len(ids))
+			//fmt.Println(merchantShopId, shop, index, len(chuckCustomers), len(chuck))
 			fmt.Println(shop, index, len(chuckCustomers), len(chuck), res.RowsAffected)
 
 			chuckCustomerLogs := make([]*model.CustomerLog, 0, 100)
 			for _, c := range chuckCustomers {
+				oldShopName, ok := shopNameHash[c.MerchantShopId]
+				if !ok {
+					oldShopName = "-"
+				}
+
 				chuckCustomerLogs = append(chuckCustomerLogs, &model.CustomerLog{
 					MerchantId:     merchantId,
 					MerchantShopId: merchantShopId,
 					CustomerId:     c.Id,
 					CustomerName:   c.Name,
 					Type:           3,
-					Comment:        "从" + shopNameHash[c.MerchantShopId] + "迁移到" + shop,
+					Comment:        "从" + oldShopName + "迁移到" + shop,
 					CreateTime:     "2025-10-15 10:00:00",
 				})
 			}

@@ -68,6 +68,7 @@ type Customer struct {
 }
 
 type CustomerBpLog struct {
+	Id             int32 `json:"id"`
 	MerchantId     int32 `json:"merchant_id"`
 	BrandId        int32 `json:"brand_id"`
 	MerchantShopId int32 `json:"merchant_shop_id"`

@@ -2,8 +2,8 @@ package mirg
 
 import "testing"
 
-var merchantId int32 = 1028
-var status int32 = 1
+var merchantId int32 = 258
+var status int32 = 2
 
 /**
 SELECT id FROM zby_customer WHERE merchant_id = 1028 order by id desc LIMIT 1;
@@ -13,12 +13,24 @@ SELECT id FROM zby_recycle_order  WHERE merchant_id = 1028 order by id desc LIMI
 SELECT id FROM zby_customer_bp_log  WHERE merchant_id = 1028 order by id desc LIMIT 1;
 */
 
+/**
+-- 门店id
+-- 969
+
+-- 会员id
+-- 239586
+
+-- 订单id
+-- 2489532
+
+*/
+
 func TestCustomerSync(t *testing.T) {
-	CustomerSync(merchantId, 1, status)
+	CustomerSync(merchantId, 239595, status)
 }
 
 func TestOrderSaleSync(t *testing.T) {
-	OrderSaleSync(merchantId, 1, status)
+	OrderSaleSync(merchantId, 2489532, status)
 }
 
 func TestOrderRefundSync(t *testing.T) {
@@ -30,5 +42,5 @@ func TestOrderRecycleSync(t *testing.T) {
 }
 
 func TestCustomerBpSync(t *testing.T) {
-	CustomerBpSync(merchantId, 1, status)
+	CustomerBpSync(merchantId, 91457, status)
 }

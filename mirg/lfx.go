@@ -11,7 +11,7 @@ import (
 )
 
 var baseUrl string = "https://mini.zhubaoe.cn"
-var configPath = "./config/online/db.yaml"
+var configPath = "./config/test/db.yaml"
 
 // var idWhere = "<="
 var idWhere = "="
@@ -214,7 +214,7 @@ func CustomerBpSync(merchantId, miniId, status int32) {
 	}
 	var customers []*Customer
 	var customerHash = make(map[int32]string, len(customers))
-	err = db.Table("zby_customer").Select("id,telephone").Where("merchant_id = ? and status = 1 and id in ?", merchantId, miniId, customerIds).Find(&customers).Error
+	err = db.Table("zby_customer").Select("id,telephone").Where("merchant_id = ? and status = 1 and id in (?)", merchantId, customerIds).Find(&customers).Error
 	if err != nil {
 		panic(err)
 	}
@@ -234,7 +234,7 @@ func CustomerBpSync(merchantId, miniId, status int32) {
 
 	if status == 2 {
 		httpClient := http.NewClient(http.SetTimeout(time.Second * 5))
-		adder := fmt.Sprintf("%s/lfx_customer_bp/push", baseUrl)
+		adder := fmt.Sprintf("%s/lmcrm/lfx_customer_bp/push", baseUrl)
 		for _, bp := range bps {
 			telephone, ok := customerHash[bp.CustomerId]
 			if !ok {

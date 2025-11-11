@@ -5,5 +5,13 @@ import (
 )
 
 func TestCustomerMerchantShopMove(t *testing.T) {
-	MerchantAction()
+	MerchantAction(false, false)
+}
+
+func TestMerchantStaffAction(t *testing.T) {
+	MerchantStaffAction(false, false)
+}
+
+func TestTestJoinHttp(t *testing.T) {
+	TestJoinHttp()
 }

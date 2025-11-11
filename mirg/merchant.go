@@ -1,7 +1,6 @@
 package mirg
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -11,8 +10,6 @@ import (
 	"github.com/long250038728/web/tool/persistence/orm"
 	"github.com/long250038728/web/tool/server/http"
 	"github.com/long250038728/web/tool/sliceconv"
-	"io/ioutil"
-	http2 "net/http"
 	"time"
 )
 
@@ -51,7 +48,7 @@ type AdminUser struct {
 }
 
 var merchantConfigPath = "./config/test/db.yaml"
-var merchantStaffUrl = "http://192.168.0.55/api.php?s=/customer/updateJoinInfoList"
+var merchantStaffUrl = "http://dev.zhubaoe.cn/api.php?s=/customer/updateJoinInfoList"
 
 //====================================================================
 
@@ -308,19 +305,10 @@ func TestJoinHttp() {
 		"list": list,
 		"s":    "123456",
 	}
-	b, _ := json.Marshal(data)
+	httpClient := http.NewClient(http.SetTimeout(time.Second * 5))
+	b, _, err := httpClient.Post(context.Background(), merchantStaffUrl, data)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10000)
-	defer cancel()
-
-	request, err := http2.NewRequestWithContext(ctx, "POST", merchantStaffUrl, bytes.NewReader(b))
-	request.Header.Set("Content-Type", "application/json")
-	res, err := http2.DefaultClient.Do(request)
-
-	defer res.Body.Close()
-	body, _ := ioutil.ReadAll(res.Body)
-
-	fmt.Println(string(body))
+	fmt.Println(string(b))
 	if err != nil {
 		fmt.Println("================", err.Error(), adminId)
 	}

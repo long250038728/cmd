@@ -1,0 +1,7 @@
+address: "gz-cdbrg-njkq65lx.sql.tencentcdb.com"
+port: 58796
+database: "zhubaoe"
+table_prefix: "zby_"
+user: "root"
+password: "zhubaoe!QAZ"
+

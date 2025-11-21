@@ -2,7 +2,6 @@ package mirg
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/long250038728/cmd/mirg/model"
 	"github.com/long250038728/web/tool/configurator"
@@ -16,13 +15,13 @@ import (
 type excelModel struct {
 	Telephone    string `json:"telephone"`
 	MerchantShop string `json:"merchant_shop"`
-	StaffName    string `json:"staff_name"`
+	StaffTel     string `json:"staff_tel"`
 }
 
 var excelHeader = []excel.Header{
 	{Key: "telephone", Name: "客户手机号", Type: "string"},
 	{Key: "merchant_shop", Name: "所属门店", Type: "string"},
-	{Key: "staff_name", Name: "归属员工姓名", Type: "string"},
+	{Key: "staff_tel", Name: "归属员工手机号", Type: "string"},
 }
 
 func excelExcel(path, sheet string) ([]*excelModel, error) {
@@ -43,18 +42,18 @@ type MerchantShop struct {
 }
 
 type AdminUser struct {
-	Id       int32  `json:"id"`
-	Username string `json:"username"`
+	Id     int32  `json:"id"`
+	Mobile string `json:"mobile"`
 }
 
-var merchantConfigPath = "./config/test/db.yaml"
+var merchantConfigPath = "./config/online/db_read.yaml"
 var merchantStaffUrl = "http://dev.zhubaoe.cn/api.php?s=/customer/updateJoinInfoList"
 
 //====================================================================
 
 func MerchantAction(isAddLog bool, isUpdate bool) {
-	var merchantId int32 = 3
-	BrandId := 1
+	var merchantId int32 = 1843
+	BrandId := 1008
 	Path := "/Users/linlong/Desktop/a.xlsx"
 	sheet := "Sheet1"
 
@@ -101,8 +100,12 @@ func MerchantAction(isAddLog bool, isUpdate bool) {
 
 	for shopName, val := range MerchantShopToCustomer {
 		merchantShopId, ok := shopHash[shopName]
+		if "老凤祥衡水信发店" == shopName {
+			continue
+		}
+
 		if !ok {
-			panic("cccc")
+			fmt.Println(fmt.Errorf("%s", shopName))
 		}
 
 		// 把数据切成1000为一次处理
@@ -168,16 +171,13 @@ func MerchantAction(isAddLog bool, isUpdate bool) {
 	}
 
 	if len(noDbTelephone) > 0 {
-		b, err := json.Marshal(noDbTelephone)
-		if err != nil {
-			fmt.Println(string(b))
-		}
+		fmt.Println(len(noDbTelephone))
 	}
 }
 
 func MerchantStaffAction(isAddLog bool, isUpdate bool) {
-	var merchantId int32 = 3
-	BrandId := 1
+	var merchantId int32 = 1843
+	BrandId := 1008
 	Path := "/Users/linlong/Desktop/a.xlsx"
 	sheet := "Sheet1"
 
@@ -197,7 +197,7 @@ func MerchantStaffAction(isAddLog bool, isUpdate bool) {
 	}
 	adminHash := make(map[string]int32)
 	for _, val := range adminUsers {
-		adminHash[val.Username] = val.Id
+		adminHash[val.Mobile] = val.Id
 	}
 
 	//====================================================================================
@@ -211,7 +211,7 @@ func MerchantStaffAction(isAddLog bool, isUpdate bool) {
 	//生成数据 key为员工归属  value 为手机号
 	MerchantStaffToCustomer := make(map[string][]string)
 	for _, c := range data {
-		MerchantStaffToCustomer[c.StaffName] = append(MerchantStaffToCustomer[c.StaffName], c.Telephone)
+		MerchantStaffToCustomer[c.StaffTel] = append(MerchantStaffToCustomer[c.StaffTel], c.Telephone)
 	}
 
 	//会员手机不在数据库中
@@ -219,10 +219,10 @@ func MerchantStaffAction(isAddLog bool, isUpdate bool) {
 
 	//====================================================================================
 
-	for staffName, val := range MerchantStaffToCustomer {
-		adminId, ok := adminHash[staffName]
+	for staffTel, val := range MerchantStaffToCustomer {
+		adminId, ok := adminHash[staffTel]
 		if !ok {
-			panic("cccc")
+			fmt.Println(fmt.Errorf("%s", staffTel))
 		}
 
 		// 把数据切成1000为一次处理
@@ -268,17 +268,19 @@ func MerchantStaffAction(isAddLog bool, isUpdate bool) {
 
 				fmt.Println(string(b))
 				if err != nil {
-					fmt.Println("================", err.Error(), adminId, staffName, index)
+					fmt.Println("================", err.Error(), adminId, staffTel, index)
 				}
 			}
 		}
 	}
 
 	if len(noDbTelephone) > 0 {
-		b, err := json.Marshal(noDbTelephone)
-		if err != nil {
-			fmt.Println(string(b))
-		}
+		//b, err := json.Marshal(noDbTelephone)
+		//if err != nil {
+		//	fmt.Println(err)
+		//}
+		//fmt.Println(string(b))
+		fmt.Println(len(noDbTelephone))
 	}
 }
 

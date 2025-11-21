@@ -10,11 +10,10 @@ import (
 	"time"
 )
 
-var baseUrl string = "https://mini.zhubaoe.cn"
-var configPath = "./config/test/db.yaml"
+var baseUrl string = "https://applet.zhubaoe.cn"
+var configPath = "./config/online/db.yaml"
 
-// var idWhere = "<="
-var idWhere = "="
+var idWhere = "<="
 
 // CustomerSync 会员同步
 func CustomerSync(merchantId, miniId, status int32) {
@@ -34,7 +33,7 @@ func CustomerSync(merchantId, miniId, status int32) {
 	}
 
 	if status == 1 {
-		fmt.Println(ids)
+		fmt.Println(len(ids))
 	}
 
 	if status == 2 {
@@ -51,7 +50,7 @@ func CustomerSync(merchantId, miniId, status int32) {
 				fmt.Println(string(b))
 				continue
 			}
-			time.Sleep(time.Second)
+			time.Sleep(time.Millisecond * 100)
 		}
 	}
 }
@@ -75,7 +74,7 @@ func OrderSaleSync(merchantId, miniId, status int32) {
 	}
 
 	if status == 1 {
-		fmt.Println(ids)
+		fmt.Println(len(ids))
 	}
 
 	if status == 2 {
@@ -94,7 +93,7 @@ func OrderSaleSync(merchantId, miniId, status int32) {
 				fmt.Println(string(b))
 				continue
 			}
-			time.Sleep(time.Second)
+			time.Sleep(time.Millisecond * 100)
 		}
 	}
 }
@@ -118,7 +117,7 @@ func OrderRefundSync(merchantId, miniId, status int32) {
 	}
 
 	if status == 1 {
-		fmt.Println(ids)
+		fmt.Println(len(ids))
 	}
 
 	if status == 2 {
@@ -137,7 +136,7 @@ func OrderRefundSync(merchantId, miniId, status int32) {
 				fmt.Println(string(b))
 				continue
 			}
-			time.Sleep(time.Second)
+			time.Sleep(time.Millisecond * 100)
 		}
 	}
 }
@@ -203,50 +202,23 @@ func CustomerBpSync(merchantId, miniId, status int32) {
 		panic(errors.New("会员积分没有数据"))
 	}
 
-	var customerIds = make([]int32, 0, len(bps))
-	for _, bp := range bps {
-		customerIds = append(customerIds, bp.CustomerId)
-	}
-
-	type Customer struct {
-		Id        int32  `json:"id"`
-		Telephone string `json:"telephone"`
-	}
-	var customers []*Customer
-	var customerHash = make(map[int32]string, len(customers))
-	err = db.Table("zby_customer").Select("id,telephone").Where("merchant_id = ? and status = 1 and id in (?)", merchantId, customerIds).Find(&customers).Error
-	if err != nil {
-		panic(err)
-	}
-	for _, customer := range customers {
-		customerHash[customer.Id] = customer.Telephone
-	}
-
 	if status == 1 {
-		for _, bp := range bps {
-			_, ok := customerHash[bp.CustomerId]
-			if !ok {
-				fmt.Println(bp.Id, ",")
-				continue
-			}
-		}
+		fmt.Println(len(bps))
 	}
 
 	if status == 2 {
 		httpClient := http.NewClient(http.SetTimeout(time.Second * 5))
 		adder := fmt.Sprintf("%s/lmcrm/lfx_customer_bp/push", baseUrl)
-		for _, bp := range bps {
-			telephone, ok := customerHash[bp.CustomerId]
-			if !ok {
-				fmt.Println(bp.Id, ",")
-				continue
-			}
+
+		fmt.Println(fmt.Sprintf("=======count: %d=======", len(bps)))
+
+		for index, bp := range bps {
+			fmt.Println(fmt.Sprintf("=======%d======= :%d", index, bp.Id))
+
 			ctx := context.Background()
 			data := map[string]any{
 				"merchant_id":      bp.MerchantId,
 				"merchant_shop_id": bp.MerchantShopId,
-				"telephone":        telephone,
-				"name":             bp.CustomerName,
 				"customer_id":      bp.CustomerId,
 				"pay_bonus":        bp.Point,
 				"comment":          bp.Comment,
@@ -256,7 +228,7 @@ func CustomerBpSync(merchantId, miniId, status int32) {
 				fmt.Println(string(b))
 				continue
 			}
-			time.Sleep(time.Second)
+			time.Sleep(time.Millisecond * 100)
 		}
 	}
 }

@@ -4,7 +4,7 @@ import "testing"
 
 var merchantId int32 = 1843
 var brandId int32 = 1008
-var status int32 = 2
+var status int32 = 1
 
 /**
 CREATE TABLE zby_customer_bp_detail_lfx
@@ -28,9 +28,9 @@ SELECT id FROM zby_refund_order WHERE merchant_id = 1843 order by id desc LIMIT 
 SELECT id FROM zby_customer_bp_log  WHERE merchant_id = 1843 order by id desc LIMIT 1;
 */
 
-func TestCustomerSync(t *testing.T) {
-	CustomerSync(merchantId, 23571329, status)
-}
+//func TestCustomerSync(t *testing.T) {
+//	CustomerSync(merchantId, brandId, 23571329, 23579210, status)
+//}
 
 func TestOrderSaleSync(t *testing.T) {
 	OrderSaleSync(merchantId, 20138422, status)

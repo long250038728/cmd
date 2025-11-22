@@ -10,16 +10,16 @@ import (
 	"time"
 )
 
-//var baseUrl string = "https://applet.zhubaoe.cn"
-//var configPath = "./config/online/db.yaml"
+var baseUrl string = "https://applet.zhubaoe.cn"
+var configPath = "./config/online/db.yaml"
 
-var baseUrl string = "https://mini.zhubaoe.cn"
-var configPath = "./config/test/db.yaml"
+//var baseUrl string = "https://mini.zhubaoe.cn"
+//var configPath = "./config/test/db.yaml"
 
 var idWhere = "<="
 
 // CustomerSync 会员同步
-func CustomerSync(merchantId, miniId, status int32) {
+func CustomerSync(merchantId, brandId, minId, maxId, status int32) {
 	var ormConfig orm.Config
 	configurator.NewYaml().MustLoad(configPath, &ormConfig)
 	db, err := orm.NewMySQLGorm(&ormConfig)
@@ -27,7 +27,7 @@ func CustomerSync(merchantId, miniId, status int32) {
 		panic(err)
 	}
 	var ids []int32
-	err = db.Table("zby_customer").Select("id").Where(fmt.Sprintf("merchant_id = ?  and status = 1 and id %s ?", idWhere), merchantId, miniId).Find(&ids).Error
+	err = db.Table("zby_customer").Select("id").Where("merchant_id = ?  and brand_id = ? and status = 1 and id > ? and id < ?", merchantId, brandId, minId, maxId).Find(&ids).Error
 	if err != nil {
 		panic(err)
 	}

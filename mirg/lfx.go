@@ -10,8 +10,11 @@ import (
 	"time"
 )
 
-var baseUrl string = "https://applet.zhubaoe.cn"
-var configPath = "./config/online/db.yaml"
+//var baseUrl string = "https://applet.zhubaoe.cn"
+//var configPath = "./config/online/db.yaml"
+
+var baseUrl string = "https://mini.zhubaoe.cn"
+var configPath = "./config/test/db.yaml"
 
 var idWhere = "<="
 
@@ -24,7 +27,7 @@ func CustomerSync(merchantId, miniId, status int32) {
 		panic(err)
 	}
 	var ids []int32
-	err = db.Table("zby_customer").Select("id").Where(fmt.Sprintf("merchant_id = ? and status = 1 and id %s ?", idWhere), merchantId, miniId).Find(&ids).Error
+	err = db.Table("zby_customer").Select("id").Where(fmt.Sprintf("merchant_id = ?  and status = 1 and id %s ?", idWhere), merchantId, miniId).Find(&ids).Error
 	if err != nil {
 		panic(err)
 	}
@@ -32,9 +35,7 @@ func CustomerSync(merchantId, miniId, status int32) {
 		panic(errors.New("会员没有数据"))
 	}
 
-	if status == 1 {
-		fmt.Println(len(ids))
-	}
+	fmt.Println(fmt.Sprintf("=======count: %d=======", len(ids)))
 
 	if status == 2 {
 		httpClient := http.NewClient(http.SetTimeout(time.Second * 5))
@@ -73,9 +74,7 @@ func OrderSaleSync(merchantId, miniId, status int32) {
 		panic(errors.New("销售单据没有数据"))
 	}
 
-	if status == 1 {
-		fmt.Println(len(ids))
-	}
+	fmt.Println(fmt.Sprintf("=======count: %d=======", len(ids)))
 
 	if status == 2 {
 		httpClient := http.NewClient(http.SetTimeout(time.Second * 5))
@@ -116,9 +115,7 @@ func OrderRefundSync(merchantId, miniId, status int32) {
 		panic(errors.New("退货单据没有数据"))
 	}
 
-	if status == 1 {
-		fmt.Println(len(ids))
-	}
+	fmt.Println(fmt.Sprintf("=======count: %d=======", len(ids)))
 
 	if status == 2 {
 		httpClient := http.NewClient(http.SetTimeout(time.Second * 5))
@@ -202,15 +199,11 @@ func CustomerBpSync(merchantId, miniId, status int32) {
 		panic(errors.New("会员积分没有数据"))
 	}
 
-	if status == 1 {
-		fmt.Println(len(bps))
-	}
+	fmt.Println(fmt.Sprintf("=======count: %d=======", len(bps)))
 
 	if status == 2 {
 		httpClient := http.NewClient(http.SetTimeout(time.Second * 5))
 		adder := fmt.Sprintf("%s/lmcrm/lfx_customer_bp/push", baseUrl)
-
-		fmt.Println(fmt.Sprintf("=======count: %d=======", len(bps)))
 
 		for index, bp := range bps {
 			fmt.Println(fmt.Sprintf("=======%d======= :%d", index, bp.Id))

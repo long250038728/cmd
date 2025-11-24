@@ -86,6 +86,7 @@ func OrderSaleSync(merchantId, miniId, status int32) {
 				"order_id":    id,
 				"order_type":  8,
 				"status":      1,
+				"isFirst":     1,
 			}
 			b, _, err := httpClient.Post(ctx, adder, data)
 			if err != nil {
@@ -127,6 +128,7 @@ func OrderRefundSync(merchantId, miniId, status int32) {
 				"order_id":    id,
 				"order_type":  9,
 				"status":      1,
+				"isFirst":     1,
 			}
 			b, _, err := httpClient.Post(ctx, adder, data)
 			if err != nil {
@@ -215,6 +217,7 @@ func CustomerBpSync(merchantId, miniId, status int32) {
 				"customer_id":      bp.CustomerId,
 				"pay_bonus":        bp.Point,
 				"comment":          bp.Comment,
+				"isFirst":          1,
 			}
 			b, _, err := httpClient.Post(ctx, adder, data)
 			if err != nil {

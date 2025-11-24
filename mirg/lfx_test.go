@@ -7,6 +7,8 @@ var status int32 = 2
 
 // var brandId int32 = 1008
 
+//SELECT id FROM zby_customer WHERE merchant_id = 1843 order by id desc LIMIT 1;
+
 /**
 CREATE TABLE zby_customer_bp_detail_lfx
 LIKE zby_customer_bp_detail;
@@ -23,7 +25,6 @@ WHERE merchant_id = 1843;
 */
 
 /**
-SELECT id FROM zby_customer WHERE merchant_id = 1843 order by id desc LIMIT 1;
 SELECT id FROM zby_sale_order WHERE merchant_id = 1843 order by id desc LIMIT 1;
 SELECT id FROM zby_refund_order WHERE merchant_id = 1843 order by id desc LIMIT 1;
 SELECT id FROM zby_customer_bp_log  WHERE merchant_id = 1843 order by id desc LIMIT 1;

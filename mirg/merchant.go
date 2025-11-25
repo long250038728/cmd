@@ -377,11 +377,22 @@ func MerchantCustomerAddAction(isUpdate bool) {
 				for _, c := range chuck {
 					if _, ok := hasTel[c.Telephone]; !ok {
 						createList = append(createList, &Customer{
-							MerchantId:     merchantId,
-							MerchantShopId: merchantShopId,
-							BrandId:        BrandId,
-							Telephone:      c.Telephone,
-							Name:           c.Name,
+							MerchantId:      merchantId,
+							MerchantShopId:  merchantShopId,
+							BrandId:         BrandId,
+							Telephone:       c.Telephone,
+							SuffixTelephone: c.Telephone[len(c.Telephone)-4:],
+							Name:            c.Name,
+							Status:          1,
+							CreateTime:      int32(time.Now().Unix()),
+							UpdateTime:      int32(time.Now().Unix()),
+							BirthdayDt:      "0000-00-00",
+							MarryDate:       "0000-00-00",
+							LastBuyTime:     "0000-00-00 00:00:00",
+							AddDatetime:     "0000-00-00 00:00:00",
+							OriginPlatform:  4,
+							OriginChannel:   4,
+							Level:           1,
 						})
 					}
 				}

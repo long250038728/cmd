@@ -59,12 +59,23 @@ func roundToNDecimal(f float64, n int) float64 {
 // ====================================================================
 
 type Customer struct {
-	Id             int32  `json:"id"`
-	Name           string `json:"name"`
-	MerchantId     int32  `json:"merchant_id"`
-	BrandId        int32  `json:"brand_id"`
-	MerchantShopId int32  `json:"merchant_shop_id"`
-	Telephone      string `json:"telephone"`
+	Id              int32  `json:"id"`
+	Name            string `json:"name"`
+	MerchantId      int32  `json:"merchant_id"`
+	BrandId         int32  `json:"brand_id"`
+	MerchantShopId  int32  `json:"merchant_shop_id"`
+	Telephone       string `json:"telephone"`
+	SuffixTelephone string `json:"suffix_telephone"`
+	CreateTime      int32  `json:"create_time"`
+	UpdateTime      int32  `json:"update_time"`
+	Status          int32  `json:"status"`
+	BirthdayDt      string `json:"birthday_dt"`
+	MarryDate       string `json:"marry_date"`
+	LastBuyTime     string `json:"last_buy_time"`
+	AddDatetime     string `json:"add_datetime"`
+	OriginChannel   int32  `json:"origin_channel"`
+	OriginPlatform  int32  `json:"origin_platform"`
+	Level           int32  `json:"level"`
 }
 
 type CustomerBpLog struct {

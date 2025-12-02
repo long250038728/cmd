@@ -22,3 +22,7 @@ func TestMerchantStaffAction(t *testing.T) {
 //func TestTestJoinHttp(t *testing.T) {
 //	TestJoinHttp()
 //}
+
+func TestAAA(t *testing.T) {
+	TestAAAAAA()
+}

@@ -9,6 +9,7 @@ import (
 	"github.com/long250038728/web/tool/persistence/orm"
 	"github.com/long250038728/web/tool/server/http"
 	"github.com/long250038728/web/tool/sliceconv"
+	"math/rand"
 	"time"
 )
 
@@ -481,3 +482,125 @@ func merchantSellerIdChange(SellerID string) string {
 //		fmt.Println("================", err.Error(), adminId)
 //	}
 //}
+
+type CustomerE struct {
+	Id       int32  `json:"id"`
+	ShopName string `json:"shop_name"`
+}
+
+type AdminE struct {
+	Tel      string `json:"tel"`
+	ShopName string `json:"shop_name"`
+}
+
+var customerHeader = []excel.Header{
+	{Key: "id", Name: "会员", Type: "int"},
+	{Key: "shop_name", Name: "门店", Type: "string"},
+}
+var adminHeader = []excel.Header{
+	{Key: "tel", Name: "手机号", Type: "string"},
+	{Key: "shop_name", Name: "所属门店", Type: "string"},
+}
+
+func TestAAAAAA() {
+	merchantId := 1843
+	//brandId := 1008
+
+	// 获取会员信息
+	var ormConfig orm.Config
+	configurator.NewYaml().MustLoad(merchantConfigPath, &ormConfig)
+	db, err := orm.NewMySQLGorm(&ormConfig)
+	if err != nil {
+		panic(err)
+	}
+
+	ShopNameToIds := make(map[string][]int32)
+	{
+		TelToId := make(map[string]int32)
+		{
+			adminUsers := make([]*AdminUser, 0, 100)
+			if err := db.Where("merchant_id = ?", merchantId).Find(&adminUsers).Error; err != nil {
+				panic(err)
+			}
+			for _, a := range adminUsers {
+				TelToId[a.Mobile] = a.Id
+			}
+		}
+
+		adminList, err := aExcel("/Users/linlong/Desktop/admin.xlsx", "Sheet1")
+		if err != nil {
+			return
+		}
+		for _, a := range adminList {
+			if _, ok := ShopNameToIds[a.ShopName]; !ok {
+				ShopNameToIds[a.ShopName] = make([]int32, 0)
+			}
+			ShopNameToIds[a.ShopName] = append(ShopNameToIds[a.ShopName], TelToId[a.Tel])
+		}
+	}
+
+	//=====
+
+	customerList, err := cExcel("/Users/linlong/Desktop/customer.xlsx", "Sheet1")
+	if err != nil {
+		return
+	}
+
+	hash := make(map[string][]*CustomerE)
+	for _, c := range customerList {
+		if _, ok := hash[c.ShopName]; !ok {
+			hash[c.ShopName] = make([]*CustomerE, 0)
+		}
+		hash[c.ShopName] = append(hash[c.ShopName], c)
+	}
+
+	for shopName, data := range hash {
+		ids := ShopNameToIds[shopName]
+		list := sliceconv.Change(data, func(d *CustomerE) map[string]any {
+			i := rand.Int() % len(ids)
+			return map[string]any{
+				"merchant_id":   1843,
+				"brand_id":      1008,
+				"customer_id":   d.Id,
+				"admin_user_id": ids[i],
+				"source":        3,
+			}
+		})
+
+		for _, chuck := range sliceconv.Chunk(list, 200) {
+			httpClient := http.NewClient(http.SetTimeout(time.Second * 5))
+			b, _, err := httpClient.Post(context.Background(), merchantStaffUrl, map[string]any{
+				"type": 1,
+				"list": chuck,
+			})
+			fmt.Println(string(b))
+			if err != nil {
+				fmt.Println("================", err.Error())
+			}
+		}
+	}
+}
+
+func cExcel(path, sheet string) ([]*CustomerE, error) {
+	var data []*CustomerE
+	r := excel.NewRead(path)
+	defer r.Close()
+	err := r.Read(sheet, customerHeader, &data)
+
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func aExcel(path, sheet string) ([]*AdminE, error) {
+	var data []*AdminE
+	r := excel.NewRead(path)
+	defer r.Close()
+	err := r.Read(sheet, adminHeader, &data)
+
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}

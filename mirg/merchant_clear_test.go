@@ -343,23 +343,24 @@ func TestMerchantClear(t *testing.T) {
 		}
 	})
 
-	//==============================
-
-	t.Run("zby_customer", func(t *testing.T) {
-		if err := readDb.Table("zby_customer").Where("merchant_id = ? AND merchant_shop_id in (?)", merchantId, MerchantShopId).Select("id").Find(&ids).Error; err != nil {
+	t.Run("zby_sale_performance", func(t *testing.T) {
+		if err := readDb.Table("zby_sale_performance").Where("merchant_id = ? AND merchant_shop_id in (?)", merchantId, MerchantShopId).Select("id").Find(&ids).Error; err != nil {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_customer").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_sale_performance").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
 			fmt.Println(res.RowsAffected)
+		}
+	})
 
-			res = db.Table("zby_customer_bp_log").Where("merchant_id = ? AND customer_id in (?)", merchantId, list).Delete(nil)
-			fmt.Println(res.RowsAffected)
+	//==============================
 
-			res = db.Table("zby_customer_bp_detail").Where("merchant_id = ? AND customer_id in (?)", merchantId, list).Delete(nil)
-			fmt.Println(res.RowsAffected)
-
-			res = db.Table("zby_customer_user_join").Where("merchant_id = ? AND customer_id in (?)", merchantId, list).Delete(nil)
+	t.Run("zby_servicing_order", func(t *testing.T) {
+		if err := readDb.Table("zby_servicing_order").Where("merchant_id = ? AND merchant_shop_id in (?)", merchantId, MerchantShopId).Select("id").Find(&ids).Error; err != nil {
+			fmt.Println("order", err)
+		}
+		for _, list := range sliceconv.Chunk(ids, 1000) {
+			res := db.Table("zby_servicing_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
 			fmt.Println(res.RowsAffected)
 		}
 	})

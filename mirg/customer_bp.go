@@ -109,8 +109,8 @@ func CustomerBpAction(accessToken int) {
 		panic(errors.New("check accessToken"))
 	}
 
-	merchantId := 4
-	BrandId := 13
+	merchantId := 0
+	BrandId := 0
 	Path := "/Users/linlong/Desktop/a.xlsx"
 	sheet := "Sheet1"
 	isAdd := true     // 新增 or 扣减

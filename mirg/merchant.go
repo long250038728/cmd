@@ -56,8 +56,8 @@ var merchantStaffUrl = "https://moss.zhubaoe.cn/api.php?s=/customer/updateJoinIn
 //====================================================================
 
 func MerchantAction(isAddLog bool, isUpdate bool) {
-	var merchantId int32 = 1843
-	BrandId := 1008
+	var merchantId int32 = 0
+	BrandId := 0
 	Path := "/Users/linlong/Desktop/a.xlsx"
 	sheet := "Sheet1"
 
@@ -180,8 +180,8 @@ func MerchantAction(isAddLog bool, isUpdate bool) {
 }
 
 func MerchantStaffAction(isUpdate bool) {
-	var merchantId int32 = 1843
-	BrandId := 1008
+	var merchantId int32 = 0
+	BrandId := 0
 	Path := "/Users/linlong/Desktop/a.xlsx"
 	sheet := "Sheet1"
 
@@ -289,7 +289,7 @@ func MerchantStaffAction(isUpdate bool) {
 }
 
 func MerchantCustomerAddAction(isUpdate bool) {
-	var merchantId int32 = 1843
+	var merchantId int32 = 0
 	var BrandId int32 = 1008
 	Path := "/Users/linlong/Desktop/b.xlsx"
 	sheet := "Sheet1"
@@ -504,7 +504,7 @@ var adminHeader = []excel.Header{
 
 func TestAAAAAA() {
 	merchantId := 1843
-	//brandId := 1008
+	//BrandId := 0
 
 	// 获取会员信息
 	var ormConfig orm.Config

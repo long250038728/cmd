@@ -2,7 +2,7 @@ package mirg
 
 import "testing"
 
-var merchantId int32 = 1843
+var merchantId int32 = 0
 var status int32 = 2
 
 // var brandId int32 = 1008
@@ -35,15 +35,15 @@ SELECT id FROM zby_customer_bp_log  WHERE merchant_id = 1843 order by id desc LI
 //}
 
 func TestOrderSaleSync(t *testing.T) {
-	OrderSaleSync(merchantId, 20138422, status)
+	//OrderSaleSync(merchantId, 20138422, status)
 }
 
 func TestOrderRefundSync(t *testing.T) {
-	OrderRefundSync(merchantId, 52508, status)
+	//OrderRefundSync(merchantId, 52508, status)
 }
 
 func TestCustomerBpSync(t *testing.T) {
-	CustomerBpSync(merchantId, 44266077, status)
+	//CustomerBpSync(merchantId, 44266077, status)
 }
 
 //func TestOrderRecycleSync(t *testing.T) {

@@ -7,11 +7,11 @@ import (
 )
 
 func TestMerchantClear(t *testing.T) {
-	merchantId := 432
-	MerchantShopId := []int32{1633, 1634, 1635, 1636, 2151, 2775, 3576, 3866, 4563}
+	merchantId := 0
+	MerchantShopId := []int32{1}
+	newMerchantId := 0
 
 	var ids []int32
-
 	db, readDb := NewDb()
 
 	t.Run("zby_sale_order", func(t *testing.T) {
@@ -19,7 +19,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("goods", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_sale_order_goods").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_sale_order_goods").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 
@@ -27,7 +27,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_sale_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_sale_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 	})
@@ -37,7 +37,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("goods", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_recycle_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_recycle_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 
@@ -45,7 +45,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_recycle_order_goods").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_recycle_order_goods").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 	})
@@ -55,7 +55,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("goods", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_sale_pay_log").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_sale_pay_log").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 	})
@@ -65,7 +65,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("goods", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_refund_order_goods").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_refund_order_goods").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 
@@ -73,7 +73,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_refund_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_refund_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 	})
@@ -83,7 +83,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("goods", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_sale_order_history").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_sale_order_history").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 	})
@@ -93,7 +93,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("goods", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_goods_stock").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_goods_stock").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 	})
@@ -103,7 +103,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("goods", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_stock_allocation_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_stock_allocation_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 
@@ -111,7 +111,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_stock_allocation_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_stock_allocation_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 	})
@@ -121,7 +121,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("goods", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_stock_conversion_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_stock_conversion_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 
@@ -129,7 +129,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_stock_conversion_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_stock_conversion_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 	})
@@ -139,7 +139,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_stock_modify_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_stock_modify_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 
@@ -151,7 +151,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("goods", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_stock_modify_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_stock_modify_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 
@@ -162,7 +162,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_stock_modify_type_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_stock_modify_type_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 
@@ -174,7 +174,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("goods", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_stock_modify_type_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_stock_modify_type_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 
@@ -185,7 +185,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_stock_price_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_stock_price_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 
@@ -197,7 +197,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("goods", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_stock_price_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_stock_price_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 	})
@@ -207,7 +207,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_stock_check_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_stock_check_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 
@@ -220,7 +220,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("goods", err)
 		}
 		for _, list := range sliceconv.Chunk(recordIds, 1000) {
-			res := db.Table("zby_stock_check_record_part_1").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_stock_check_record_part_1").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 
@@ -228,7 +228,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("goods", err)
 		}
 		for _, list := range sliceconv.Chunk(recordIds, 1000) {
-			res := db.Table("zby_stock_check_record_part_2").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_stock_check_record_part_2").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 
@@ -236,7 +236,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("goods", err)
 		}
 		for _, list := range sliceconv.Chunk(recordIds, 1000) {
-			res := db.Table("zby_stock_check_record_part_3").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_stock_check_record_part_3").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 	})
@@ -246,7 +246,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_stock_modify_order_v2").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_stock_modify_order_v2").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 
@@ -259,7 +259,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("goods", err)
 		}
 		for _, list := range sliceconv.Chunk(recordIds, 1000) {
-			res := db.Table("zby_stock_modify_order_v2_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_stock_modify_order_v2_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 
@@ -270,7 +270,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_goods_import_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_goods_import_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 
@@ -283,7 +283,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("goods", err)
 		}
 		for _, list := range sliceconv.Chunk(recordIds, 1000) {
-			res := db.Table("zby_goods_import_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_goods_import_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 
@@ -294,7 +294,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_stock_export_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_stock_export_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 
@@ -306,7 +306,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("goods", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_stock_export_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_stock_export_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 	})
@@ -316,7 +316,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_stock_add_order").Where("id in (?)", list).Delete(nil)
+			res := db.Table("zby_stock_add_order").Where("id in (?)", list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 
@@ -328,7 +328,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("goods", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_stock_add_record").Where("id in (?)", list).Delete(nil)
+			res := db.Table("zby_stock_add_record").Where("id in (?)", list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 	})
@@ -338,7 +338,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_sale_performance").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_sale_performance").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 	})
@@ -348,7 +348,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_sale_performance").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_sale_performance").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 	})
@@ -360,7 +360,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_servicing_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_servicing_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 	})
@@ -370,7 +370,7 @@ func TestMerchantClear(t *testing.T) {
 	//		fmt.Println("order", err)
 	//	}
 	//	for _, list := range sliceconv.Chunk(ids, 1000) {
-	//		res := db.Table("zby_goods_stock_extend").Where("id in (?)", list).Delete(nil)
+	//		res := db.Table("zby_goods_stock_extend").Where("id in (?)", list).Update("merchant_id",newMerchantId)
 	//		fmt.Println(res.RowsAffected)
 	//	}
 	//})
@@ -382,7 +382,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_old_stock").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_old_stock").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 	})
@@ -392,7 +392,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_old_stock_export_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_old_stock_export_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 
@@ -404,7 +404,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("goods", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_old_stock_export_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_old_stock_export_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 	})
@@ -414,7 +414,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_financial_profit_statement").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_financial_profit_statement").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 	})
@@ -424,7 +424,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_income_expenditure_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_income_expenditure_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 	})
@@ -434,7 +434,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_old_stock_period").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_old_stock_period").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 	})
@@ -444,7 +444,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_old_stock_auditor").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_old_stock_auditor").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 	})
@@ -456,7 +456,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_policy").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_policy").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 	})
@@ -466,7 +466,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_coupon_customer_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_coupon_customer_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 	})
@@ -476,7 +476,7 @@ func TestMerchantClear(t *testing.T) {
 			fmt.Println("order", err)
 		}
 		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_bonus_shop_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Delete(nil)
+			res := db.Table("zby_bonus_shop_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
 	})

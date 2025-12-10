@@ -9,7 +9,7 @@ import (
 func TestMerchantClear(t *testing.T) {
 	merchantId := 0
 	MerchantShopId := []int32{1}
-	newMerchantId := 0
+	newMerchantId := -0
 
 	var ids []int32
 	db, readDb := NewDb()
@@ -605,6 +605,64 @@ func TestMerchantClear(t *testing.T) {
 //zby_goods_import_record
 //zby_stock_export_record
 //goods_stock
+//```
+//POST /sale_performance/_update_by_query?wait_for_completion=true
+//{
+//     "script":{
+//        "lang":"painless",
+//        "source":"ctx._source.merchant_id = 0"
+//      },
+//        "query": {
+//            "bool": {
+//                    "must":[
+//                            {
+//                             "term":{
+//                                    "merchant_id":361
+//                                }
+//
+//                            },
+//                            {
+//                                "terms":{
+//                                    "merchant_shop_id":[1472]
+//                                }
+//
+//                            }
+//
+//                    ]
+//
+//                }
+//            },
+//    "track_total_hits":true
+//}
+//```
+
+//sale_performance  有个查询不加商户id
+
+//```
+//POST /sale_performance/_update_by_query?wait_for_completion=true
+//{
+//     "script":{
+//        "lang":"painless",
+//        "source":"ctx._source.merchant_shop_id = 0"
+//      },
+//        "query": {
+//            "bool": {
+//                    "must":[
+//
+//                            {
+//                                "terms":{
+//                                    "merchant_shop_id":[1267, 1268, 1269, 1270, 1272]
+//                                }
+//
+//                            }
+//
+//                    ]
+//
+//                }
+//            },
+//    "track_total_hits":true
+//}
+//```
 
 //es
 //sale_order_report   单据

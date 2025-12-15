@@ -6,6 +6,21 @@ import (
 	"testing"
 )
 
+func TestOrderCheckOrderContentClear(t *testing.T) {
+	db, readDb := NewDb()
+	var ids []int32
+	if err := readDb.Table("zby_order_check").Where("id <= 1547044 and JSON_LENGTH(order_content) > 0").Select("id").Find(&ids).Error; err != nil {
+		fmt.Println("zby_order_check", err)
+	}
+
+	t.Log(len(ids))
+
+	for _, list := range sliceconv.Chunk(ids, 1000) {
+		res := db.Table("zby_order_check").Where("id in (?)", list).Update("order_content", "{}")
+		fmt.Println(res.RowsAffected)
+	}
+}
+
 func TestMerchantClear(t *testing.T) {
 	merchantId := 0
 	MerchantShopId := []int32{1}

@@ -9,3 +9,7 @@ func TestAA(t *testing.T) {
 func TestCC(t *testing.T) {
 	//CustomerJson()
 }
+
+func TestVV(t *testing.T) {
+	//CustomerBpNum(4)
+}

@@ -224,3 +224,64 @@ func CustomerJson() {
 		fmt.Println(mq.LPush(ctx, "mq_pipeline_bonus", string(b)))
 	}
 }
+
+func CustomerBpNum(accessToken int) {
+	if accessToken != time.Now().Day() {
+		panic(errors.New("check accessToken"))
+	}
+
+	merchantId := 0
+	isAdd := true // 新增 or 扣减
+	//isChange := false // excel中数据是否需要加上负数
+
+	// 获取会员信息
+	var ormConfig orm.Config
+	configurator.NewYaml().MustLoad("./config/online/db_read.yaml", &ormConfig)
+	db, err := orm.NewMySQLGorm(&ormConfig)
+	if err != nil {
+		panic(err)
+	}
+	customers := make([]*Customer, 0, 100000)
+	if err := db.Where("merchant_id = ?", merchantId).
+		Where("status = ?", 1).
+		Find(&customers).Error; err != nil {
+		panic(err)
+	}
+
+	// 转换成新的结构体
+	var Type int32 = 2
+	Comment := "手工录入(积分扣减)"
+	if isAdd {
+		Comment = "手工录入(积分增加)"
+	}
+	customerBpLog := sliceconv.Change(customers, func(customer *Customer) *CustomerBpLog {
+		return &CustomerBpLog{
+			MerchantId:     customer.MerchantId,
+			BrandId:        customer.BrandId,
+			MerchantShopId: customer.MerchantShopId,
+			CustomerId:     customer.Id,
+			CustomerName:   customer.Name,
+			Type:           Type,
+			Comment:        Comment,
+			PointTotal:     188,
+			Point:          188,
+		}
+	})
+
+	//return
+
+	// 发送消息
+	ctx := context.Background()
+	var redisConfig cache.Config
+	configurator.NewYaml().MustLoad("./config/online/redis.yaml", &redisConfig)
+	mq := cache.NewRedis(&redisConfig)
+	for index, item := range customerBpLog {
+		b, err := json.Marshal(&item)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		res, err := mq.LPush(ctx, "mq_pipeline_bonus", string(b))
+		fmt.Println(index, res, err)
+	}
+}

@@ -237,6 +237,16 @@ func TestMerchantClear(t *testing.T) {
 		}
 	})
 
+	t.Run("zby_stock_inventory_order", func(t *testing.T) {
+		if err := readDb.Table("zby_stock_inventory_order").Where("merchant_id = ? AND merchant_shop_id in (?)", merchantId, MerchantShopId).Select("id").Find(&ids).Error; err != nil {
+			fmt.Println("order", err)
+		}
+		for _, list := range sliceconv.Chunk(ids, 1000) {
+			res := db.Table("zby_stock_inventory_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+			fmt.Println(res.RowsAffected)
+		}
+	})
+
 	t.Run("zby_stock_check_order", func(t *testing.T) {
 		if err := readDb.Table("zby_stock_check_order").Where("merchant_id = ? AND merchant_shop_id in (?)", merchantId, MerchantShopId).Select("id").Find(&ids).Error; err != nil {
 			fmt.Println("order", err)
@@ -510,6 +520,16 @@ func TestMerchantClear(t *testing.T) {
 				res := db.Table("zby_old_stock_delivery_record").Where("id in (?)", list).Update("merchant_id", newMerchantId)
 				fmt.Println(res.RowsAffected)
 			}
+		}
+	})
+
+	t.Run("zby_old_stock_delivery", func(t *testing.T) {
+		if err := readDb.Table("zby_old_stock_delivery").Where("merchant_id = ? AND merchant_shop_id in (?)", merchantId, MerchantShopId).Select("id").Find(&ids).Error; err != nil {
+			fmt.Println("order", err)
+		}
+		for _, list := range sliceconv.Chunk(ids, 1000) {
+			res := db.Table("zby_old_stock_delivery").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+			fmt.Println(res.RowsAffected)
 		}
 	})
 

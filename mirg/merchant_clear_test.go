@@ -1,9 +1,12 @@
 package mirg
 
 import (
+	"context"
 	"fmt"
 	"github.com/long250038728/web/tool/sliceconv"
+	"github.com/olivere/elastic/v7"
 	"testing"
+	"time"
 )
 
 func TestOrderCheckOrderContentClear(t *testing.T) {
@@ -13,8 +16,6 @@ func TestOrderCheckOrderContentClear(t *testing.T) {
 		fmt.Println("zby_order_check", err)
 	}
 
-	t.Log(len(ids))
-
 	for _, list := range sliceconv.Chunk(ids, 1000) {
 		res := db.Table("zby_order_check").Where("id in (?)", list).Update("order_content", "{}")
 		fmt.Println(res.RowsAffected)
@@ -23,7 +24,7 @@ func TestOrderCheckOrderContentClear(t *testing.T) {
 
 func TestMerchantClear(t *testing.T) {
 	merchantId := 0
-	MerchantShopId := []int32{1}
+	MerchantShopId := []int32{0}
 	newMerchantId := -0
 
 	var ids []int32
@@ -622,6 +623,66 @@ func TestMerchantClear(t *testing.T) {
 			res := db.Table("zby_customer_bp_detail").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
 			fmt.Println(res.RowsAffected)
 		}
+	})
+}
+
+func TestMerchantESClear(t *testing.T) {
+	merchantId := 0
+	MerchantShopId := []int32{0}
+	client := NewEs()
+
+	t.Run("es", func(t *testing.T) {
+		shopIds := sliceconv.Change(MerchantShopId, func(t int32) interface{} {
+			return t
+		})
+		query := elastic.NewBoolQuery().Must(
+			elastic.NewTermQuery("merchant_id", merchantId),
+			elastic.NewTermsQuery("merchant_shop_id", shopIds...),
+		)
+
+		script := elastic.NewScript(`ctx._source.merchant_id = 0`).Lang("painless")
+		indexes := []string{
+			"sale_order_record_report",
+			"import_sale_report.2023",
+			"import_sale_report.2024",
+			"import_sale_report.2025",
+			"import_sale_report.2026",
+			"old_stock_import_sale_report",
+			"sale_order_report",
+			"zby_stock_allocation_record",
+			"zby_customer",
+			"sale_performance",
+			"sale_performance_rel",
+			"stock_price_record",
+			"zby_goods_import_record",
+			"zby_stock_export_record",
+			"goods_stock",
+		}
+		for _, index := range indexes {
+			res, err := client.UpdateByQuery(index).Query(query).Script(script).WaitForCompletion(false).Do(context.Background())
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			fmt.Printf("Updated docs: %d\n", res.Updated)
+			time.Sleep(time.Second * 60)
+		}
+	})
+	t.Run("es2", func(t *testing.T) {
+		shopIds := sliceconv.Change(MerchantShopId, func(t int32) interface{} {
+			return t
+		})
+		query := elastic.NewBoolQuery().Must(
+			elastic.NewTermsQuery("merchant_shop_id", shopIds...),
+		)
+		script := elastic.NewScript(`ctx._source.merchant_shop_id = 0`).Lang("painless")
+
+		res, err := client.UpdateByQuery("sale_performance").Query(query).Script(script).WaitForCompletion(false).Do(context.Background())
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		fmt.Printf("Updated docs: %d\n", res.Updated)
 	})
 }
 

@@ -2,6 +2,7 @@ package mirg
 
 import (
 	"github.com/long250038728/web/tool/configurator"
+	"github.com/long250038728/web/tool/persistence/cache"
 	"github.com/long250038728/web/tool/persistence/es"
 	"github.com/long250038728/web/tool/persistence/orm"
 )
@@ -32,5 +33,13 @@ func NewEs() (db *es.ES) {
 	if err != nil {
 		panic(err)
 	}
+	return
+}
+
+func NewRedis() (redis cache.Cache) {
+	var configPath = "./config/online/redis.yaml"
+	var config cache.Config
+	configurator.NewYaml().MustLoad(configPath, &config)
+	redis = cache.NewRedis(&config)
 	return
 }

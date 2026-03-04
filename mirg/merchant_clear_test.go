@@ -631,7 +631,7 @@ func TestMerchantClear(t *testing.T) {
 
 func TestMerchantRedisClear(t *testing.T) {
 	merchantId := 0
-	redis := NewRedis()
+	redis := NewRedis(1)
 	t.Run("merchant:goods_stock:code", func(t *testing.T) {
 		ok, err := redis.Del(context.Background(), fmt.Sprintf("merchant:goods_stock:code:%d", merchantId))
 		t.Log(ok, err)

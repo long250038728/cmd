@@ -36,10 +36,11 @@ func NewEs() (db *es.ES) {
 	return
 }
 
-func NewRedis() (redis cache.Cache) {
+func NewRedis(index int) (redis cache.Cache) {
 	var configPath = "./config/online/redis.yaml"
 	var config cache.Config
 	configurator.NewYaml().MustLoad(configPath, &config)
+	config.Db = index
 	redis = cache.NewRedis(&config)
 	return
 }

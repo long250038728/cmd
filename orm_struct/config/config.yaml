@@ -1,0 +1,7 @@
+sources:
+  zhubaoe:
+    config_path: ./config/zhubaoe/db.yaml
+    db_name: zhubaoe
+  emperor:
+    config_path: ./config/emperor/db.yaml
+    db_name: zhubaoe_emperor

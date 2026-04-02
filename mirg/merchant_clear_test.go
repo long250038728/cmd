@@ -664,6 +664,37 @@ func TestMerchantRedisClear(t *testing.T) {
 	})
 }
 
+func TestMerchantClearAllImport(t *testing.T) {
+	merchantId := 0
+	newMerchantId := -0
+
+	var ids []int32
+	db, readDb := NewDb()
+	t.Run("zby_goods_import_order", func(t *testing.T) {
+		if err := readDb.Table("zby_goods_import_order").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+			fmt.Println("order", err)
+		}
+		for _, list := range sliceconv.Chunk(ids, 1000) {
+			res := db.Table("zby_goods_import_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+			fmt.Println(res.RowsAffected)
+		}
+
+		if len(ids) == 0 {
+			return
+		}
+
+		var recordIds []int32
+		if err := readDb.Table("zby_goods_import_record").Where("merchant_id = ? AND import_id in (?)", merchantId, ids).Select("id").Find(&recordIds).Error; err != nil {
+			fmt.Println("goods", err)
+		}
+		for _, list := range sliceconv.Chunk(recordIds, 1000) {
+			res := db.Table("zby_goods_import_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+			fmt.Println(res.RowsAffected)
+		}
+
+	})
+}
+
 func TestMerchantESClear(t *testing.T) {
 	merchantId := 0
 	MerchantShopId := []int32{0}

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/long250038728/web/tool/configurator"
@@ -39,6 +40,16 @@ var (
 
 // 初始化配置
 func initConfig() {
+	exePath, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	exePath, err = filepath.EvalSymlinks(exePath)
+	if err != nil {
+		panic(err)
+	}
+	exeDir := filepath.Dir(exePath)
+	configFile = filepath.Join(exeDir, "config", "config.yaml")
 	configurator.NewYaml().MustLoad(configFile, &appConfig)
 }
 
@@ -72,8 +83,11 @@ var rootCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		// 使用source对应的配置
-		configPath = configInfo.ConfigPath
+		// 使用source对应的配置，路径相对于可执行文件目录
+		exePath, _ := os.Executable()
+		exePath, _ = filepath.EvalSymlinks(exePath)
+		exeDir := filepath.Dir(exePath)
+		configPath = filepath.Join(exeDir, configInfo.ConfigPath)
 		dbName = configInfo.DbName
 
 		// 加载数据库配置文件

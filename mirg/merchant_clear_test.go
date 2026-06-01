@@ -665,9 +665,6 @@ func TestMerchantClear(t *testing.T) {
 	})
 }
 
-//redis db1 set 删除
-//merchant:goods_stock:code:1249
-
 func TestMerchantRedisClear(t *testing.T) {
 	merchantId := 0
 	redis := NewRedis(1)

@@ -35,10 +35,12 @@ func TestDelete(t *testing.T) {
 	}
 }
 
+func getMerchantInfo() (merchantId int32, merchantShopId []int32, newMerchantId int32) {
+	return 0, []int32{0}, 0
+}
+
 func TestMerchantClear(t *testing.T) {
-	merchantId := 0
-	MerchantShopId := []int32{0}
-	newMerchantId := -0
+	merchantId, MerchantShopId, newMerchantId := getMerchantInfo()
 
 	var ids []int32
 	db, readDb := NewDb()
@@ -666,7 +668,7 @@ func TestMerchantClear(t *testing.T) {
 }
 
 func TestMerchantRedisClear(t *testing.T) {
-	merchantId := 0
+	merchantId, _, _ := getMerchantInfo()
 	redis := NewRedis(1)
 	t.Run("merchant:goods_stock:code", func(t *testing.T) {
 		ok, err := redis.Del(context.Background(), fmt.Sprintf("merchant:goods_stock:code:%d", merchantId))
@@ -675,8 +677,7 @@ func TestMerchantRedisClear(t *testing.T) {
 }
 
 func TestMerchantClearAllImport(t *testing.T) {
-	merchantId := 0
-	newMerchantId := -0
+	merchantId, _, newMerchantId := getMerchantInfo()
 
 	var ids []int32
 	db, readDb := NewDb()
@@ -706,8 +707,7 @@ func TestMerchantClearAllImport(t *testing.T) {
 }
 
 func TestMerchantESClear(t *testing.T) {
-	merchantId := 0
-	MerchantShopId := []int32{0}
+	merchantId, MerchantShopId, _ := getMerchantInfo()
 	client := NewEs()
 
 	t.Run("es", func(t *testing.T) {

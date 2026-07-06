@@ -10,6 +10,6 @@ func TestCC(t *testing.T) {
 	//CustomerJson()
 }
 
-func TestVV(t *testing.T) {
-	//CustomerBpNum(4)
+func TestCustomerBpAllMerchant(t *testing.T) {
+	//CustomerBpAllMerchant(4)
 }

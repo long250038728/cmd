@@ -225,7 +225,7 @@ func CustomerJson() {
 	}
 }
 
-func CustomerBpNum(accessToken int) {
+func CustomerBpAllMerchant(accessToken int) {
 	if accessToken != time.Now().Day() {
 		panic(errors.New("check accessToken"))
 	}

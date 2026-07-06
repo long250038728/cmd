@@ -26,11 +26,13 @@ func TestDelete(t *testing.T) {
 	var ids []int32
 	db, readDb := NewDb()
 
-	if err := readDb.Table("zby_stock_modify_order_v2_record").Where("merchant_id < ?", 0).Select("id").Find(&ids).Error; err != nil {
+	table := "zby_customer_bp_log"
+
+	if err := readDb.Table(table).Where("merchant_id < ?", 0).Select("id").Find(&ids).Error; err != nil {
 		fmt.Println("goods", err)
 	}
 	for _, list := range sliceconv.Chunk(ids, 1000) {
-		res := db.Table("zby_stock_modify_order_v2_record").Debug().Where("merchant_id < ? AND id in (?)", 0, list).Delete(nil)
+		res := db.Table(table).Debug().Where("merchant_id < ? AND id in (?)", 0, list).Delete(nil)
 		fmt.Println(res.RowsAffected)
 	}
 }

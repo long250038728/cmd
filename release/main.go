@@ -39,11 +39,12 @@ func init() {
 	if err != nil {
 		panic(fmt.Errorf("设置配置文件路径失败: %w", err))
 	}
+	// MustLoadConfigPath 读取环境变量CONFIG的路径 + 对应的子目录/文件
 	configLoad := configurator.NewYaml()
-	configLoad.MustLoadConfigPath("config/other/gitee.yaml", &gitConfig)
-	configLoad.MustLoadConfigPath("config/other/jenkins.yaml", &jenkinsConfig)
-	configLoad.MustLoadConfigPath("config/other/ssh.yaml", &sshConfig)
-	configLoad.MustLoadConfigPath("config/online/db.yaml", &ormConfig)
+	configLoad.MustLoadConfigPath("other/gitee.yaml", &gitConfig)
+	configLoad.MustLoadConfigPath("other/jenkins.yaml", &jenkinsConfig)
+	configLoad.MustLoadConfigPath("other/ssh.yaml", &sshConfig)
+	configLoad.MustLoadConfigPath("online/db.yaml", &ormConfig)
 
 	if gitClient, err = git.NewGiteeClient(&gitConfig); err != nil {
 		panic(err)

@@ -673,6 +673,243 @@ func TestMerchantClear(t *testing.T) {
 	})
 }
 
+func TestMerchantAllMerchantShopClear(t *testing.T) {
+	merchantId, _, newMerchantId := getMerchantInfo()
+
+	var ids []int32
+	db, readDb := NewDb()
+
+	t.Run("erp", func(t *testing.T) {
+		t.Run("zby_stock_warning", func(t *testing.T) {
+			if err := readDb.Table("zby_stock_warning").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_stock_warning").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+
+		t.Run("zby_sale_type_setting", func(t *testing.T) {
+			if err := readDb.Table("zby_sale_type_setting").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_sale_type_setting").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+
+		t.Run("zby_role_authorization_conf", func(t *testing.T) {
+			if err := readDb.Table("zby_role_authorization_conf").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_role_authorization_conf").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+
+		t.Run("zby_activity_discount", func(t *testing.T) {
+			if err := readDb.Table("zby_activity_discount").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_activity_discount").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+
+		t.Run("zby_old_stock_supplier", func(t *testing.T) {
+			if err := readDb.Table("zby_old_stock_supplier").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_old_stock_supplier").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+
+		t.Run("zby_label", func(t *testing.T) {
+			if err := readDb.Table("zby_label").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_label").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+
+		t.Run("zby_activities_use_log", func(t *testing.T) {
+			if err := readDb.Table("zby_activities_use_log").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_activities_use_log").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+
+	})
+
+	t.Run("mp", func(t *testing.T) {
+		t.Run("zby_wechat_fans_tags", func(t *testing.T) {
+			if err := readDb.Table("zby_wechat_fans_tags").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_wechat_fans_tags").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+
+		t.Run("zby_activity", func(t *testing.T) {
+			if err := readDb.Table("zby_activity").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_activity").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+
+		t.Run("zby_activity_booking", func(t *testing.T) {
+			if err := readDb.Table("zby_activity_booking").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_activity_booking").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", 0)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+
+		t.Run("zby_activity_present", func(t *testing.T) {
+			if err := readDb.Table("zby_activity_present").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_activity_present").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+
+		t.Run("zby_act_lottery_config", func(t *testing.T) {
+			if err := readDb.Table("zby_act_lottery_config").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_act_lottery_config").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", 0)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+
+		t.Run("zby_bonus_shop_record", func(t *testing.T) {
+			if err := readDb.Table("zby_bonus_shop_record").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_bonus_shop_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", 0)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+
+	})
+
+	t.Run("log", func(t *testing.T) {
+		t.Run("zby_system_operation_log", func(t *testing.T) {
+			if err := readDb.Table("zby_system_operation_log").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_system_operation_log").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+
+		t.Run("zby_gold_sale_price_config_log", func(t *testing.T) {
+			if err := readDb.Table("zby_gold_sale_price_config_log").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_gold_sale_price_config_log").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+
+		t.Run("zby_login_log", func(t *testing.T) {
+			if err := readDb.Table("zby_login_log").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_login_log").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+
+	})
+
+	t.Run("scrm", func(t *testing.T) {
+		t.Run("zby_customer_bp_config", func(t *testing.T) {
+			if err := readDb.Table("zby_customer_bp_config").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_customer_bp_config").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+		t.Run("zby_customer_bp_use_config", func(t *testing.T) {
+			if err := readDb.Table("zby_customer_bp_use_config").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_customer_bp_use_config").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+
+		t.Run("zby_customer_bp_activity", func(t *testing.T) {
+			if err := readDb.Table("zby_customer_bp_activity").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_customer_bp_activity").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+
+		t.Run("zby_customer_import_record", func(t *testing.T) {
+			if err := readDb.Table("zby_customer_import_record").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_customer_import_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+
+		t.Run("zby_customer_import_detail", func(t *testing.T) {
+			if err := readDb.Table("zby_customer_import_detail").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_customer_import_detail").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+
+		t.Run("zby_customer_user_join", func(t *testing.T) {
+			if err := readDb.Table("zby_customer_user_join").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_customer_user_join").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+	})
+}
+
 func TestMerchantRedisClear(t *testing.T) {
 	merchantId, _, _ := getMerchantInfo()
 	redis := NewRedis(1)

@@ -42,7 +42,23 @@ func TestDelete(t *testing.T) {
 }
 
 func getMerchantInfo() (merchantId int32, merchantShopId []int32, newMerchantId int32) {
-	return 0, []int32{0}, 0
+
+	merchantCode := "SC999999"
+
+	_, readDb := NewDb()
+	err := readDb.Table("zby_merchant").Select("id").Where("merchant_code = ?", merchantCode).Find(&merchantId).Error
+	if err != nil {
+		panic(err)
+	}
+
+	err = readDb.Table("zby_merchant_shop").Select("id").Where("merchant_id = ?", merchantId).Find(&merchantShopId).Error
+	if err != nil {
+		panic(err)
+	}
+
+	newMerchantId = -merchantId
+
+	return merchantId, merchantShopId, newMerchantId
 }
 
 func TestMerchantClear(t *testing.T) {
@@ -463,16 +479,6 @@ func TestMerchantClear(t *testing.T) {
 		}
 	})
 
-	//t.Run("zby_goods_stock_extend", func(t *testing.T) {
-	//	if err := readDb.Table("zby_goods_stock_extend").Where("merchant_id = ?", merchantId).Select("id").Find(&ids).Error; err != nil {
-	//		fmt.Println("order", err)
-	//	}
-	//	for _, list := range sliceconv.Chunk(ids, 1000) {
-	//		res := db.Table("zby_goods_stock_extend").Where("id in (?)", list).Update("merchant_id", newMerchantId)
-	//		fmt.Println(res.RowsAffected)
-	//	}
-	//})
-
 	//==============================
 
 	t.Run("zby_old_stock", func(t *testing.T) {
@@ -673,6 +679,161 @@ func TestMerchantClear(t *testing.T) {
 	})
 }
 
+func TestMerchantRedisClear(t *testing.T) {
+	merchantId, _, _ := getMerchantInfo()
+	redis := NewRedis(1)
+	t.Run("merchant:goods_stock:code", func(t *testing.T) {
+		ok, err := redis.Del(context.Background(), fmt.Sprintf("merchant:goods_stock:code:%d", merchantId))
+		t.Log(ok, err)
+	})
+}
+
+func TestMerchantClearAllImport(t *testing.T) {
+	merchantId, _, newMerchantId := getMerchantInfo()
+
+	var ids []int32
+	db, readDb := NewDb()
+	t.Run("zby_goods_import_order", func(t *testing.T) {
+		if err := readDb.Table("zby_goods_import_order").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+			fmt.Println("order", err)
+		}
+		for _, list := range sliceconv.Chunk(ids, 1000) {
+			res := db.Table("zby_goods_import_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+			fmt.Println(res.RowsAffected)
+		}
+
+		if len(ids) == 0 {
+			return
+		}
+
+		var recordIds []int32
+		if err := readDb.Table("zby_goods_import_record").Where("merchant_id = ? AND import_id in (?)", merchantId, ids).Select("id").Find(&recordIds).Error; err != nil {
+			fmt.Println("goods", err)
+		}
+		for _, list := range sliceconv.Chunk(recordIds, 1000) {
+			res := db.Table("zby_goods_import_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+			fmt.Println(res.RowsAffected)
+		}
+
+	})
+
+	t.Run("zby_goods_stock_extend", func(t *testing.T) {
+		if err := readDb.Table("zby_goods_stock_extend").Where("merchant_id = ?", merchantId).Select("id").Find(&ids).Error; err != nil {
+			fmt.Println("order", err)
+		}
+		for _, list := range sliceconv.Chunk(ids, 1000) {
+			res := db.Table("zby_goods_stock_extend").Where("id in (?)", list).Update("merchant_id", newMerchantId)
+			fmt.Println(res.RowsAffected)
+		}
+	})
+
+	t.Run("zby_customer", func(t *testing.T) {
+		if err := readDb.Table("zby_customer").Where("merchant_id = ?", merchantId).Select("id").Find(&ids).Error; err != nil {
+			fmt.Println("order", err)
+		}
+		for _, list := range sliceconv.Chunk(ids, 1000) {
+			res := db.Table("zby_customer").Where("id in (?)", list).Update("merchant_id", newMerchantId)
+			fmt.Println(res.RowsAffected)
+		}
+	})
+
+	t.Run("zby_user", func(t *testing.T) {
+		if err := readDb.Table("zby_user").Where("merchant_id = ?", merchantId).Select("id").Find(&ids).Error; err != nil {
+			fmt.Println("order", err)
+		}
+		for _, list := range sliceconv.Chunk(ids, 1000) {
+			res := db.Table("zby_user").Where("id in (?)", list).Update("merchant_id", newMerchantId)
+			fmt.Println(res.RowsAffected)
+		}
+	})
+
+	t.Run("zby_customer_user_join", func(t *testing.T) {
+		if err := readDb.Table("zby_customer_user_join").Where("merchant_id = ?", merchantId).Select("id").Find(&ids).Error; err != nil {
+			fmt.Println("order", err)
+		}
+		for _, list := range sliceconv.Chunk(ids, 1000) {
+			res := db.Table("zby_customer_user_join").Where("id in (?)", list).Update("merchant_id", newMerchantId)
+			fmt.Println(res.RowsAffected)
+		}
+	})
+}
+
+func TestMerchantESClear(t *testing.T) {
+	merchantId, MerchantShopId, _ := getMerchantInfo()
+	client := NewEs()
+
+	t.Run("es", func(t *testing.T) {
+		shopIds := sliceconv.Change(MerchantShopId, func(t int32) interface{} {
+			return t
+		})
+		query := elastic.NewBoolQuery().Must(
+			elastic.NewTermQuery("merchant_id", merchantId),
+			elastic.NewTermsQuery("merchant_shop_id", shopIds...),
+		)
+
+		script := elastic.NewScript(`ctx._source.merchant_id = 0`).Lang("painless")
+		indexes := []string{
+			"sale_order_record_report",
+			"import_sale_report.2023",
+			"import_sale_report.2024",
+			"import_sale_report.2025",
+			"import_sale_report.2026",
+			"old_stock_import_sale_report",
+			"sale_order_report",
+			"zby_stock_allocation_record",
+			"zby_customer",
+			"sale_performance",
+			"sale_performance_rel",
+			"stock_price_record",
+			"zby_goods_import_record",
+			"zby_stock_export_record",
+			"goods_stock",
+		}
+		for _, index := range indexes {
+			res, err := client.UpdateByQuery(index).Query(query).Script(script).WaitForCompletion(false).Do(context.Background())
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			fmt.Printf("Updated docs: %d\n", res.Updated)
+			time.Sleep(time.Second * 60)
+		}
+	})
+	t.Run("es2", func(t *testing.T) {
+		shopIds := sliceconv.Change(MerchantShopId, func(t int32) interface{} {
+			return t
+		})
+		query := elastic.NewBoolQuery().Must(
+			elastic.NewTermsQuery("merchant_shop_id", shopIds...),
+		)
+		script := elastic.NewScript(`ctx._source.merchant_shop_id = 0`).Lang("painless")
+
+		res, err := client.UpdateByQuery("sale_performance").Query(query).Script(script).WaitForCompletion(false).Do(context.Background())
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		fmt.Printf("Updated docs: %d\n", res.Updated)
+	})
+}
+
+//es
+//sale_order_report   单据
+//sale_order_record_report 单据明细
+//import_sale_report.2023  进销存
+//import_sale_report.2024  进销存
+//import_sale_report.2025 进销存
+//old_stock_import_sale_report 旧料入库跟销售
+//zby_stock_allocation_record  调拨
+//zby_customer 会员
+//sale_performance  业绩
+//sale_performance_rel  业绩关系
+//stock_price_record 金价
+//zby_goods_import_record 入库
+//zby_stock_export_record 出库
+
+//=================================================================
+
 func TestMerchantAllMerchantShopClear(t *testing.T) {
 	merchantId, _, newMerchantId := getMerchantInfo()
 
@@ -750,9 +911,29 @@ func TestMerchantAllMerchantShopClear(t *testing.T) {
 			}
 		})
 
+		t.Run("zby_shift_job_record", func(t *testing.T) {
+			if err := readDb.Table("zby_shift_job_record").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_shift_job_record").Delete("merchant_id = ? AND id in (?)", merchantId, list)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+
 	})
 
 	t.Run("mp", func(t *testing.T) {
+		t.Run("zby_user", func(t *testing.T) {
+			if err := readDb.Table("zby_user").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_user").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+
 		t.Run("zby_wechat_fans_tags", func(t *testing.T) {
 			if err := readDb.Table("zby_wechat_fans_tags").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
 				fmt.Println("goods", err)
@@ -809,6 +990,16 @@ func TestMerchantAllMerchantShopClear(t *testing.T) {
 			}
 			for _, list := range sliceconv.Chunk(ids, 1000) {
 				res := db.Table("zby_bonus_shop_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", 0)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+
+		t.Run("zby_income_expenditure_record", func(t *testing.T) {
+			if err := readDb.Table("zby_old_stock_export_order").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_old_stock_export_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", 0)
 				fmt.Println(res.RowsAffected)
 			}
 		})
@@ -908,191 +1099,27 @@ func TestMerchantAllMerchantShopClear(t *testing.T) {
 			}
 		})
 	})
-}
 
-func TestMerchantRedisClear(t *testing.T) {
-	merchantId, _, _ := getMerchantInfo()
-	redis := NewRedis(1)
-	t.Run("merchant:goods_stock:code", func(t *testing.T) {
-		ok, err := redis.Del(context.Background(), fmt.Sprintf("merchant:goods_stock:code:%d", merchantId))
-		t.Log(ok, err)
-	})
-}
-
-func TestMerchantClearAllImport(t *testing.T) {
-	merchantId, _, newMerchantId := getMerchantInfo()
-
-	var ids []int32
-	db, readDb := NewDb()
-	t.Run("zby_goods_import_order", func(t *testing.T) {
-		if err := readDb.Table("zby_goods_import_order").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
-			fmt.Println("order", err)
-		}
-		for _, list := range sliceconv.Chunk(ids, 1000) {
-			res := db.Table("zby_goods_import_order").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
-			fmt.Println(res.RowsAffected)
-		}
-
-		if len(ids) == 0 {
-			return
-		}
-
-		var recordIds []int32
-		if err := readDb.Table("zby_goods_import_record").Where("merchant_id = ? AND import_id in (?)", merchantId, ids).Select("id").Find(&recordIds).Error; err != nil {
-			fmt.Println("goods", err)
-		}
-		for _, list := range sliceconv.Chunk(recordIds, 1000) {
-			res := db.Table("zby_goods_import_record").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
-			fmt.Println(res.RowsAffected)
-		}
-
-	})
-}
-
-func TestMerchantESClear(t *testing.T) {
-	merchantId, MerchantShopId, _ := getMerchantInfo()
-	client := NewEs()
-
-	t.Run("es", func(t *testing.T) {
-		shopIds := sliceconv.Change(MerchantShopId, func(t int32) interface{} {
-			return t
-		})
-		query := elastic.NewBoolQuery().Must(
-			elastic.NewTermQuery("merchant_id", merchantId),
-			elastic.NewTermsQuery("merchant_shop_id", shopIds...),
-		)
-
-		script := elastic.NewScript(`ctx._source.merchant_id = 0`).Lang("painless")
-		indexes := []string{
-			"sale_order_record_report",
-			"import_sale_report.2023",
-			"import_sale_report.2024",
-			"import_sale_report.2025",
-			"import_sale_report.2026",
-			"old_stock_import_sale_report",
-			"sale_order_report",
-			"zby_stock_allocation_record",
-			"zby_customer",
-			"sale_performance",
-			"sale_performance_rel",
-			"stock_price_record",
-			"zby_goods_import_record",
-			"zby_stock_export_record",
-			"goods_stock",
-		}
-		for _, index := range indexes {
-			res, err := client.UpdateByQuery(index).Query(query).Script(script).WaitForCompletion(false).Do(context.Background())
-			if err != nil {
-				t.Error(err)
-				return
+	t.Run("app", func(t *testing.T) {
+		t.Run("zby_push_log", func(t *testing.T) {
+			if err := readDb.Table("zby_push_log").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
 			}
-			fmt.Printf("Updated docs: %d\n", res.Updated)
-			time.Sleep(time.Second * 60)
-		}
-	})
-	t.Run("es2", func(t *testing.T) {
-		shopIds := sliceconv.Change(MerchantShopId, func(t int32) interface{} {
-			return t
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_push_log").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+				fmt.Println(res.RowsAffected)
+			}
 		})
-		query := elastic.NewBoolQuery().Must(
-			elastic.NewTermsQuery("merchant_shop_id", shopIds...),
-		)
-		script := elastic.NewScript(`ctx._source.merchant_shop_id = 0`).Lang("painless")
 
-		res, err := client.UpdateByQuery("sale_performance").Query(query).Script(script).WaitForCompletion(false).Do(context.Background())
-		if err != nil {
-			t.Error(err)
-			return
-		}
-		fmt.Printf("Updated docs: %d\n", res.Updated)
+		t.Run("zby_order_check", func(t *testing.T) {
+			if err := readDb.Table("zby_order_check").Where("merchant_id = ? ", merchantId).Select("id").Find(&ids).Error; err != nil {
+				fmt.Println("goods", err)
+			}
+			for _, list := range sliceconv.Chunk(ids, 1000) {
+				res := db.Table("zby_order_check").Where("merchant_id = ? AND id in (?)", merchantId, list).Update("merchant_id", newMerchantId)
+				fmt.Println(res.RowsAffected)
+			}
+		})
+
 	})
 }
-
-//es
-//sale_order_record_report
-//import_sale_report.2023
-//import_sale_report.2024
-//import_sale_report.2025
-//old_stock_import_sale_report
-//sale_order_report
-//zby_stock_allocation_record
-//zby_customer
-//sale_performance
-//sale_performance_rel
-//stock_price_record
-//zby_goods_import_record
-//zby_stock_export_record
-//goods_stock
-//```
-//POST /sale_performance/_update_by_query?wait_for_completion=true
-//{
-//     "script":{
-//        "lang":"painless",
-//        "source":"ctx._source.merchant_id = 0"
-//      },
-//        "query": {
-//            "bool": {
-//                    "must":[
-//                            {
-//                             "term":{
-//                                    "merchant_id":361
-//                                }
-//
-//                            },
-//                            {
-//                                "terms":{
-//                                    "merchant_shop_id":[1472]
-//                                }
-//
-//                            }
-//
-//                    ]
-//
-//                }
-//            },
-//    "track_total_hits":true
-//}
-//```
-
-//sale_performance  有个查询不加商户id
-
-//```
-//POST /sale_performance/_update_by_query?wait_for_completion=true
-//{
-//     "script":{
-//        "lang":"painless",
-//        "source":"ctx._source.merchant_shop_id = 0"
-//      },
-//        "query": {
-//            "bool": {
-//                    "must":[
-//
-//                            {
-//                                "terms":{
-//                                    "merchant_shop_id":[1267, 1268, 1269, 1270, 1272]
-//                                }
-//
-//                            }
-//
-//                    ]
-//
-//                }
-//            },
-//    "track_total_hits":true
-//}
-//```
-
-//es
-//sale_order_report   单据
-//sale_order_record_report 单据明细
-//import_sale_report.2023  进销存
-//import_sale_report.2024  进销存
-//import_sale_report.2025 进销存
-//old_stock_import_sale_report 旧料入库跟销售
-//zby_stock_allocation_record  调拨
-//zby_customer 会员
-//sale_performance  业绩
-//sale_performance_rel  业绩关系
-//stock_price_record 金价
-//zby_goods_import_record 入库
-//zby_stock_export_record 出库

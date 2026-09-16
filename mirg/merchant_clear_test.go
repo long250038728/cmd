@@ -26,7 +26,7 @@ func TestDelete(t *testing.T) {
 	var ids []int32
 	db, readDb := NewDb()
 
-	table := "zby_stock_change_log_part_3"
+	table := "zby_stock_change_log_part_1"
 	//zby_stock_check_record_part_1
 	if err := readDb.Table(table).Where("merchant_id < ?", 0).Select("id").Find(&ids).Error; err != nil {
 		fmt.Println("goods", err)
@@ -42,8 +42,7 @@ func TestDelete(t *testing.T) {
 }
 
 func getMerchantInfo() (merchantId int32, merchantShopId []int32, newMerchantId int32) {
-
-	merchantCode := "SC999999"
+	merchantCode := ""
 
 	_, readDb := NewDb()
 	err := readDb.Table("zby_merchant").Select("id").Where("merchant_code = ?", merchantCode).Find(&merchantId).Error
